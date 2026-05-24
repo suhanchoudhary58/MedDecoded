@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MedDecoded</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07101D;--surface:rgba(255,255,255,0.04);--surface-hover:rgba(0,210,160,0.07);
+  --border:1px solid rgba(0,210,160,0.13);--border-hover:1px solid rgba(0,210,160,0.38);
+  --teal:#00D2A0;--teal-glow:rgba(0,210,160,0.12);--teal-border:1px solid #00D2A0;
+  --text:#DFF0F7;--muted:#5C7B8F;--dim:rgba(255,255,255,0.07);
+  --red-bg:rgba(255,107,107,0.08);--red-border:1px solid rgba(255,107,107,0.22);
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans','Segoe UI',system-ui,sans-serif;min-height:100vh}
+input,select,textarea,button{font-family:inherit}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+select option{background:#0D1B2A}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,210,160,0.2);border-radius:3px}
+nav{position:sticky;top:0;z-index:100;height:58px;background:rgba(7,16,29,0.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--dim);display:flex;align-items:center;gap:4px;padding:0 1.5rem;overflow-x:auto}
+.nav-brand{background:transparent;border:none;cursor:pointer;font-size:17px;font-weight:800;color:var(--teal);letter-spacing:-0.02em;white-space:nowrap;padding:0 8px 0 0}
+.nav-brand span{color:var(--text)}
+.nav-links{display:flex;gap:2px;flex:1}
+.nav-btn{background:transparent;border:1px solid transparent;border-radius:8px;padding:6px 13px;font-size:13.5px;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all 0.15s;font-weight:400}
+.nav-btn:hover{color:var(--text)}
+.nav-btn.active{background:var(--teal-glow);border:var(--teal-border);color:var(--teal);font-weight:600}
+.nav-ver{font-size:11px;color:#FF9999;background:var(--surface);border:1px solid rgba(255,107,107,0.3);border-radius:20px;padding:3px 11px;flex-shrink:0;cursor:pointer}
+.page{display:none}.page.active{display:block}
+.hero{text-align:center;padding:4.5rem 2rem 3rem}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--teal-glow);border:var(--teal-border);border-radius:20px;padding:5px 16px;margin-bottom:1.75rem;font-size:11.5px;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
+.hero-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block}
+.hero h1{font-size:clamp(2.2rem,6vw,4.2rem);font-weight:800;line-height:1.08;letter-spacing:-0.03em;margin-bottom:1rem}
+.hero h1 span{color:var(--teal)}
+.hero p{font-size:16px;color:var(--muted);max-width:480px;margin:0 auto 2.5rem;line-height:1.75}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-teal{background:var(--teal);color:#07101D;border:none;border-radius:11px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity 0.2s}
+.btn-teal:hover{opacity:0.88}
+.btn-teal:disabled{background:rgba(0,210,160,0.35);cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--text);border:var(--border);border-radius:11px;padding:12px 24px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s}
+.btn-ghost:hover{border:var(--border-hover);color:var(--teal)}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;padding:0 1.5rem 5rem;max-width:980px;margin:0 auto}
+.feature-card{background:var(--surface);border:var(--border);border-radius:16px;padding:1.5rem;text-align:left;cursor:pointer;transition:all 0.2s}
+.feature-card:hover{background:var(--surface-hover);border:var(--border-hover);transform:translateY(-2px)}
+.feature-icon{font-size:28px;margin-bottom:0.875rem}
+.feature-title{font-weight:700;color:var(--text);font-size:15px;margin-bottom:0.4rem}
+.feature-desc{color:var(--muted);font-size:13px;line-height:1.65}
+.search-wrap{max-width:740px;margin:0 auto;padding:2.5rem 1.5rem}
+.page-header{margin-bottom:2rem}
+.page-header h2{font-size:26px;font-weight:800;margin-bottom:0.35rem;letter-spacing:-0.02em}
+.page-header p{color:var(--muted);font-size:14px}
+.search-row{display:flex;gap:10px;margin-bottom:2rem}
+.search-input{flex:1;background:var(--surface);border:var(--border);border-radius:11px;padding:13px 16px;font-size:15px;color:var(--text);outline:none;transition:border 0.2s}
+.search-input:focus{border:var(--teal-border)}
+.mic-btn{background:transparent;border:var(--border);border-radius:11px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.2s}
+.mic-btn.listening{background:var(--teal-glow);border:var(--teal-border);animation:micPulse 1.1s ease-in-out infinite}
+.result-header{background:var(--teal-glow);border:var(--teal-border);border-radius:16px;padding:1.5rem 1.75rem;margin-bottom:1.5rem}
+.result-name{color:var(--teal);font-size:22px;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.4rem}
+.result-tagline{color:var(--text);font-size:15px;opacity:0.88;line-height:1.6}
+.result-section{background:var(--surface);border:var(--border);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:0.875rem}
+.section-label{display:flex;align-items:center;gap:9px;margin-bottom:0.75rem}
+.section-label span.icon{font-size:16px}
+.section-label span.title{font-size:11px;font-weight:700;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase}
+.section-content{color:var(--text);line-height:1.85;font-size:14.5px}
+.disclaimer{background:var(--red-bg);border:var(--red-border);border-radius:12px;padding:1rem 1.25rem;margin-top:0.5rem}
+.disclaimer p{margin:0;font-size:13px;color:#FFAAAA;line-height:1.65}
+.drug-row{display:flex;gap:8px;margin-bottom:10px;align-items:center}
+.drug-num{width:28px;color:var(--teal);font-weight:700;font-size:13px;text-align:center;flex-shrink:0}
+.drug-input{flex:1;background:var(--surface);border:var(--border);border-radius:11px;padding:12px 16px;font-size:14px;color:var(--text);outline:none}
+.drug-input:focus{border:var(--teal-border)}
+.btn-remove{background:transparent;border:var(--border);border-radius:9px;width:42px;height:42px;color:var(--muted);cursor:pointer;font-size:18px;flex-shrink:0}
+.risk-card{border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1.25rem;display:flex;gap:16px;align-items:flex-start}
+.sev-tag{font-size:11px;padding:3px 11px;border-radius:20px;font-weight:700}
+.interact-card{background:var(--surface);border:var(--border);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:0.875rem}
+.interact-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem}
+.interact-pair{font-weight:700;color:var(--teal);font-size:14px}
+.recommend-box{background:var(--teal-glow);border:var(--teal-border);border-radius:12px;padding:1.25rem 1.5rem;margin-top:0.5rem}
+.tracker-wrap{max-width:820px;margin:0 auto;padding:2.5rem 1.5rem}
+.tracker-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;flex-wrap:wrap;gap:12px}
+.add-form{background:var(--surface);border:var(--teal-border);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:2rem}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:0 1.5rem}
+.form-grid-small{display:grid;grid-template-columns:1fr 1fr;gap:0 8px}
+.field-label{display:block;font-size:12px;font-weight:700;color:var(--teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px}
+.field-input{width:100%;background:var(--surface);border:var(--border);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--text);outline:none;margin-bottom:1.1rem}
+.field-input:focus{border:var(--teal-border)}
+.field-select{width:100%;background:#0D1B2A;border:var(--border);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--text);outline:none;appearance:none;margin-bottom:1.1rem}
+.field-select:focus{border:var(--teal-border)}
+.section-title{font-size:11px;font-weight:700;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:1rem}
+.schedule-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:2.5rem}
+.sched-card{background:var(--surface);border-radius:14px;padding:1rem 1.25rem;transition:all 0.2s}
+.sched-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem}
+.sched-dot{width:10px;height:10px;border-radius:50%}
+.sched-time{font-size:13px;font-weight:700;color:var(--muted)}
+.sched-name{font-weight:700;color:var(--text);font-size:15px;margin-bottom:2px}
+.sched-sub{font-size:13px;color:var(--muted);margin-bottom:0.875rem}
+.taken-btn{width:100%;border-radius:9px;padding:8px 0;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.med-list-card{background:var(--surface);border:var(--border);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:0.875rem;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.med-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.med-info{flex:1}
+.med-name{font-weight:700;color:var(--text);font-size:15px}
+.med-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.adherence-score{text-align:center;min-width:60px}
+.adherence-val{font-size:18px;font-weight:800}
+.adherence-lbl{font-size:11px;color:var(--muted)}
+.btn-edit{background:transparent;border:var(--border);border-radius:8px;padding:7px 13px;color:var(--muted);cursor:pointer;font-size:13px}
+.btn-delete{background:transparent;border:var(--red-border);border-radius:8px;padding:7px 13px;color:#FF9999;cursor:pointer;font-size:13px}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer}
+.empty-state{text-align:center;padding:3rem;color:var(--muted);font-size:15px}
+.empty-icon{font-size:40px;margin-bottom:1rem}
+.empty-title{font-weight:600;color:var(--text);margin-bottom:0.5rem}
+.profile-wrap{max-width:700px;margin:0 auto;padding:2.5rem 1.5rem}
+.profile-summary{background:var(--teal-glow);border:var(--teal-border);border-radius:12px;padding:1.25rem 1.5rem;margin-top:2rem}
+.summary-title{font-size:12px;font-weight:700;color:var(--teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.75rem}
+.saved-msg{color:var(--teal);font-size:14px;font-weight:600}
+.auth-wrap{max-width:420px;margin:5rem auto;padding:0 1.5rem}
+.auth-card{background:var(--surface);border:var(--teal-border);border-radius:18px;padding:2.5rem}
+.auth-logo{text-align:center;margin-bottom:2rem}
+.auth-logo h2{font-size:26px;font-weight:800;color:var(--teal)}
+.auth-logo h2 span{color:var(--text)}
+.auth-logo p{color:var(--muted);font-size:13px;margin-top:4px}
+.auth-tabs{display:flex;gap:4px;background:rgba(255,255,255,0.04);border-radius:10px;padding:4px;margin-bottom:2rem}
+.auth-tab{flex:1;padding:9px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.auth-tab.active{background:var(--teal);color:#07101D}
+.auth-tab:not(.active){background:transparent;color:var(--muted)}
+.auth-error{background:var(--red-bg);border:var(--red-border);border-radius:10px;padding:10px 14px;color:#FF9999;font-size:13px;margin-bottom:1rem}
+.auth-switch{text-align:center;margin-top:1.25rem;font-size:13px;color:var(--muted)}
+.auth-switch a{color:var(--teal);cursor:pointer;text-decoration:none}
+.history-wrap{max-width:740px;margin:0 auto;padding:2.5rem 1.5rem}
+.history-item{background:var(--surface);border:var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s}
+.history-item:hover{border:var(--border-hover);background:var(--surface-hover)}
+.history-type{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px}
+.history-query{font-weight:600;color:var(--text);font-size:14px}
+.history-date{font-size:12px;color:var(--muted);white-space:nowrap;margin-left:12px}
+.btn-del-history{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:4px 8px;border-radius:6px}
+.btn-del-history:hover{color:#FF9999}
+.spinner-wrap{display:flex;justify-content:center;padding:3rem 0}
+.spinner{width:34px;height:34px;border-radius:50%;border:2px solid rgba(0,210,160,0.15);border-top-color:var(--teal);animation:spin 0.8s linear infinite}
+.loading-note{text-align:center;color:var(--muted);font-size:13px;margin-top:-1.5rem;padding-bottom:1rem}
+#auth-gate{display:none}
+#app-shell{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,210,160,0.4)}50%{box-shadow:0 0 0 7px rgba(0,210,160,0)}}
+</style>
+</head>
+<body>
+
+<div id="auth-gate">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <h2>Med<span>Decoded</span></h2>
+        <p>Healthcare Intelligence Platform</p>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Register</button>
+      </div>
+      <div id="auth-error" class="auth-error" style="display:none"></div>
+      <div id="form-login">
+        <label class="field-label">Email</label>
+        <input class="field-input" id="login-email" type="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter')login()"/>
+        <label class="field-label">Password</label>
+        <input class="field-input" id="login-password" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"/>
+        <button class="btn-teal" style="width:100%;padding:13px;font-size:15px;margin-top:0.5rem" onclick="login()">Login</button>
+      </div>
+      <div id="form-register" style="display:none">
+        <label class="field-label">Full Name</label>
+        <input class="field-input" id="reg-name" type="text" placeholder="Your name"/>
+        <label class="field-label">Email</label>
+        <input class="field-input" id="reg-email" type="email" placeholder="you@email.com"/>
+        <label class="field-label">Password</label>
+        <input class="field-input" id="reg-password" type="password" placeholder="Min 8 characters"/>
+        <button class="btn-teal" style="width:100%;padding:13px;font-size:15px;margin-top:0.5rem" onclick="register()">Create Account</button>
+      </div>
+      <p class="auth-switch" id="auth-switch-text">Don't have an account? <a onclick="switchTab('register')">Register</a></p>
+    </div>
+  </div>
+</div>
+
+<div id="app-shell">
+  <nav>
+    <button class="nav-brand" onclick="navigate('home')">Med<span>Decoded</span></button>
+    <div class="nav-links">
+      <button class="nav-btn active" data-page="home" onclick="navigate('home')">Home</button>
+      <button class="nav-btn" data-page="medicine" onclick="navigate('medicine')">Medicines</button>
+      <button class="nav-btn" data-page="disease" onclick="navigate('disease')">Diseases</button>
+      <button class="nav-btn" data-page="drug-checker" onclick="navigate('drug-checker')">Drug Checker</button>
+      <button class="nav-btn" data-page="surgery" onclick="navigate('surgery')">Surgeries</button>
+      <button class="nav-btn" data-page="lab" onclick="navigate('lab')">Lab Reports</button>
+      <button class="nav-btn" data-page="symptom" onclick="navigate('symptom')">Symptoms</button>
+      <button class="nav-btn" data-page="tracker" onclick="navigate('tracker')">📅 Tracker</button>
+      <button class="nav-btn" data-page="history" onclick="navigate('history')">🕓 History</button>
+      <button class="nav-btn" data-page="profile" onclick="navigate('profile')">👤 Profile</button>
+    </div>
+    <button class="nav-ver" onclick="logout()">Logout</button>
+  </nav>
+
+  <div id="page-home" class="page active">
+    <div class="hero">
+      <div class="hero-badge"><span class="hero-dot"></span>Healthcare Intelligence Platform</div>
+      <h1>Healthcare,<br><span>finally decoded.</span></h1>
+      <p>Understand medicines, diseases, surgeries &amp; treatments — powered by AI, built for you.</p>
+      <div class="hero-btns">
+        <button class="btn-teal" style="padding:14px 30px;font-size:15px" onclick="navigate('medicine')">Search a Medicine</button>
+        <button class="btn-ghost" style="padding:14px 30px;font-size:15px" onclick="navigate('tracker')">My Medicine Tracker</button>
+      </div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card" onclick="navigate('medicine')"><div class="feature-icon">💊</div><div class="feature-title">Medicine Search</div><div class="feature-desc">Uses, dosage, side effects &amp; interactions.</div></div>
+      <div class="feature-card" onclick="navigate('disease')"><div class="feature-icon">🦠</div><div class="feature-title">Disease Decoder</div><div class="feature-desc">Symptoms, causes, treatments &amp; prevention.</div></div>
+      <div class="feature-card" onclick="navigate('drug-checker')"><div class="feature-icon">⚠️</div><div class="feature-title">Drug Checker</div><div class="feature-desc">Check dangerous medicine combinations.</div></div>
+      <div class="feature-card" onclick="navigate('surgery')"><div class="feature-icon">🏥</div><div class="feature-title">Surgery Explainer</div><div class="feature-desc">What to expect before, during &amp; after.</div></div>
+      <div class="feature-card" onclick="navigate('lab')"><div class="feature-icon">🔬</div><div class="feature-title">Lab Report Reader</div><div class="feature-desc">Understand your test results in plain English.</div></div>
+      <div class="feature-card" onclick="navigate('symptom')"><div class="feature-icon">🩺</div><div class="feature-title">Symptom Checker</div><div class="feature-desc">Describe symptoms, get possible causes.</div></div>
+    </div>
+  </div>
+
+  <div id="page-medicine" class="page"><div class="search-wrap" id="sw-medicine"></div></div>
+  <div id="page-disease" class="page"><div class="search-wrap" id="sw-disease"></div></div>
+  <div id="page-surgery" class="page"><div class="search-wrap" id="sw-surgery"></div></div>
+  <div id="page-lab" class="page"><div class="search-wrap" id="sw-lab"></div></div>
+  <div id="page-symptom" class="page"><div class="search-wrap" id="sw-symptom"></div></div>
+
+  <div id="page-drug-checker" class="page">
+    <div class="search-wrap">
+      <div class="page-header"><h2>⚠️ Drug Interaction Checker</h2><p>Enter 2–6 medicines to check for dangerous combinations</p></div>
+      <div id="drug-inputs"></div>
+      <div style="display:flex;gap:10px;margin-top:1.25rem;margin-bottom:2rem;flex-wrap:wrap">
+        <button class="btn-ghost" id="btn-add-drug" onclick="addDrugRow()">+ Add Medicine</button>
+        <button class="btn-teal" onclick="checkDrugs()" id="btn-check-drugs">Check Interactions</button>
+      </div>
+      <div id="drug-result"></div>
+    </div>
+  </div>
+
+  <div id="page-tracker" class="page">
+    <div class="tracker-wrap">
+      <div class="tracker-top">
+        <div class="page-header" style="margin-bottom:0"><h2>📅 Medicine Tracker</h2><p id="tracker-date"></p></div>
+        <button class="btn-teal" onclick="toggleAddForm()" id="btn-toggle-add">+ Add Medicine</button>
+      </div>
+      <div id="add-med-form" style="display:none" class="add-form"></div>
+      <div id="today-schedule"></div>
+      <div class="section-title">My Medicines</div>
+      <div id="med-list"></div>
+    </div>
+  </div>
+
+  <div id="page-history" class="page">
+    <div class="history-wrap">
+      <div class="page-header"><h2>🕓 Search History</h2><p>Your recent medical searches</p></div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <div id="page-profile" class="page">
+    <div class="profile-wrap">
+      <div class="page-header"><h2>👤 Health Profile</h2><p>Your personal health information</p></div>
+      <div class="form-grid-2">
+        <div><label class="field-label">Full Name</label><input class="field-input" id="p-name" placeholder="Your name"/></div>
+        <div><label class="field-label">Age</label><input class="field-input" id="p-age" type="number" placeholder="32"/></div>
+        <div><label class="field-label">Gender</label>
+          <select class="field-select" id="p-gender"><option value="">Select…</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Prefer not to say</option></select></div>
+        <div><label class="field-label">Blood Type</label>
+          <select class="field-select" id="p-blood"><option value="">Select…</option><option>A+</option><option>A−</option><option>B+</option><option>B−</option><option>AB+</option><option>AB−</option><option>O+</option><option>O−</option><option>Unknown</option></select></div>
+      </div>
+      <label class="field-label">Medical Conditions</label>
+      <input class="field-input" id="p-conditions" placeholder="e.g. Type 2 Diabetes, Hypertension"/>
+      <label class="field-label">Allergies</label>
+      <input class="field-input" id="p-allergies" placeholder="e.g. Penicillin, Sulfa drugs"/>
+      <div class="form-grid-2">
+        <div><label class="field-label">Doctor's Name</label><input class="field-input" id="p-doctor" placeholder="Dr. Sharma"/></div>
+        <div><label class="field-label">Emergency Contact</label><input class="field-input" id="p-phone" placeholder="+91 98765 43210"/></div>
+      </div>
+      <label class="field-label">Additional Notes</label>
+      <textarea class="field-input" id="p-notes" rows="3" placeholder="Any other health notes…" style="resize:vertical"></textarea>
+      <div style="display:flex;align-items:center;gap:16px">
+        <button class="btn-teal" style="padding:13px 30px;font-size:15px" onclick="saveProfile()">Save Profile</button>
+        <span id="profile-saved" class="saved-msg" style="display:none">✓ Saved!</span>
+      </div>
+      <div id="profile-summary" style="display:none" class="profile-summary">
+        <div class="summary-title">Your Health Summary</div>
+        <div id="summary-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config ───────────────────────────────────────────────────────────────────
+const API = "http://localhost:4000";
+const OR_KEY = "YOUR_OPENROUTER_KEY_HERE";
+const OR_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OR_MODEL = "anthropic/claude-3-haiku";
+
+const MED_COLORS = ["#00D2A0","#4A9FFF","#FF6B9D","#FFB547","#A78BFA","#34D399","#F87171","#60A5FA"];
+let token = localStorage.getItem("md_token");
+let currentUser = null, medicines = [], adherence = {}, drugRows = 2;
+
+// ── API helpers ──────────────────────────────────────────────────────────────
+async function apiFetch(path, opts={}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: {"Content-Type":"application/json", ...(token?{Authorization:`Bearer ${token}`}:{}), ...opts.headers}
+  });
+  return res.json();
+}
+const apiGet = p => apiFetch(p);
+const apiPost = (p,b) => apiFetch(p,{method:"POST",body:JSON.stringify(b)});
+const apiPut = (p,b) => apiFetch(p,{method:"PUT",body:JSON.stringify(b)});
+const apiDelete = p => apiFetch(p,{method:"DELETE"});
+
+// ── OpenRouter AI ────────────────────────────────────────────────────────────
+async function askAI(system, user) {
+  const res = await fetch(OR_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + OR_KEY,
+      "HTTP-Referer": "http://localhost",
+      "X-Title": "MedDecoded"
+    },
+    body: JSON.stringify({
+      model: OR_MODEL,
+      max_tokens: 4000,
+      messages: [
+        {role:"system", content: system},
+        {role:"user", content: user}
+      ]
+    })
+  });
+  const d = await res.json();
+  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  return d.choices[0].message.content;
+}
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+function showAuthErr(msg){const el=document.getElementById("auth-error");el.textContent=msg;el.style.display="block";}
+function clearAuthErr(){document.getElementById("auth-error").style.display="none";}
+
+function switchTab(tab){
+  document.getElementById("form-login").style.display=tab==="login"?"block":"none";
+  document.getElementById("form-register").style.display=tab==="register"?"block":"none";
+  document.getElementById("tab-login").classList.toggle("active",tab==="login");
+  document.getElementById("tab-register").classList.toggle("active",tab==="register");
+  document.getElementById("auth-switch-text").innerHTML=tab==="login"
+    ?`Don't have an account? <a onclick="switchTab('register')">Register</a>`
+    :`Already have an account? <a onclick="switchTab('login')">Login</a>`;
+  clearAuthErr();
+}
+
+async function login(){
+  clearAuthErr();
+  const email=document.getElementById("login-email").value.trim();
+  const password=document.getElementById("login-password").value;
+  if(!email||!password) return showAuthErr("Please fill all fields.");
+  const data=await apiPost("/api/auth/login",{email,password});
+  if(data.error) return showAuthErr(data.error);
+  token=data.token; localStorage.setItem("md_token",token);
+  currentUser=data.user; bootApp();
+}
+
+async function register(){
+  clearAuthErr();
+  const name=document.getElementById("reg-name").value.trim();
+  const email=document.getElementById("reg-email").value.trim();
+  const password=document.getElementById("reg-password").value;
+  if(!name||!email||!password) return showAuthErr("Please fill all fields.");
+  if(password.length<8) return showAuthErr("Password must be at least 8 characters.");
+  const data=await apiPost("/api/auth/register",{name,email,password});
+  if(data.error) return showAuthErr(data.error);
+  token=data.token; localStorage.setItem("md_token",token);
+  currentUser=data.user; bootApp();
+}
+
+function logout(){
+  token=null;currentUser=null;localStorage.removeItem("md_token");
+  document.getElementById("app-shell").style.display="none";
+  document.getElementById("auth-gate").style.display="block";
+}
+
+async function bootApp(){
+  document.getElementById("auth-gate").style.display="none";
+  document.getElementById("app-shell").style.display="block";
+  const [meds,adh]=await Promise.all([apiGet("/api/medicines"),apiGet("/api/adherence")]);
+  medicines=Array.isArray(meds)?meds:[];
+  adherence=adh&&!adh.error?adh:{};
+  navigate("home"); renderTracker(); loadProfile();
+  document.getElementById("tracker-date").textContent="Today is "+new Date().toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long"});
+}
+
+async function init(){
+  if(token){
+    const me=await apiGet("/api/auth/me");
+    if(me&&me.id){currentUser=me;bootApp();return;}
+    localStorage.removeItem("md_token");token=null;
+  }
+  document.getElementById("auth-gate").style.display="block";
+}
+init();
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function navigate(page){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-"+page)?.classList.add("active");
+  document.querySelector(`[data-page="${page}"]`)?.classList.add("active");
+  if(["medicine","disease","surgery","lab","symptom"].includes(page)) initSearchPage(page);
+  if(page==="drug-checker") initDrugChecker();
+  if(page==="history") loadHistory();
+  if(page==="tracker") renderTracker();
+}
+
+// ── Search configs ───────────────────────────────────────────────────────────
+const CONFIGS={
+  medicine:{title:"Medicine Search",icon:"💊",placeholder:"e.g. Paracetamol, Ibuprofen…",
+    system:`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"name":"s","tagline":"s","overview":"s","uses":"s","dosage":"s","sideEffects":"s","interactions":"s","warnings":"s","alternatives":"s"}`,
+    sections:[["overview","Overview","📋"],["uses","Medical Uses","🎯"],["dosage","Dosage Guide","⚖️"],["sideEffects","Side Effects","⚠️"],["interactions","Drug Interactions","🔗"],["warnings","Warnings","🚨"],["alternatives","Alternatives","🔄"]]},
+  disease:{title:"Disease Decoder",icon:"🦠",placeholder:"e.g. Obesity, Diabetes…",
+    system:`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"name":"s","tagline":"s","definition":"s","criteria":"s","problems":"s","causes":"s","levels":"s","conservativeTreatment":"s","whenMedication":"s","whenSurgery":"s","surgeriesWorldwide":"s","surgeriesIndia":"s","postSurgeryComplications":"s"}`,
+    sections:[["definition","Definition","📖"],["criteria","Diagnostic Criteria","📊"],["problems","Problems & Impacts","🩺"],["causes","Causes & Risk Factors","🔬"],["levels","Stages & Levels","📈"],["conservativeTreatment","Diet, Exercise & Medicines","🌿"],["whenMedication","When Medication Needed","💊"],["whenSurgery","When Surgery Recommended","⚕️"],["surgeriesWorldwide","Surgeries Worldwide","🌍"],["surgeriesIndia","Surgeries in India","🇮🇳"],["postSurgeryComplications","Post-Surgery Complications","⚠️"]]},
+  surgery:{title:"Surgery Explainer",icon:"🏥",placeholder:"e.g. Appendectomy, Bypass…",
+    system:`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"name":"s","tagline":"s","overview":"s","preparation":"s","procedure":"s","recovery":"s","risks":"s","alternatives":"s","whenNeeded":"s"}`,
+    sections:[["overview","Overview","📋"],["preparation","Before Surgery","📝"],["procedure","The Procedure","🔧"],["recovery","Recovery","💪"],["risks","Risks","⚠️"],["alternatives","Alternatives","🔄"],["whenNeeded","When Needed","🚨"]]},
+  lab:{title:"Lab Report Reader",icon:"🔬",placeholder:"e.g. HbA1c 7.2, TSH 5.1…",
+    system:`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"name":"s","tagline":"s","overview":"s","normalRange":"s","whatItMeans":"s","highLow":"s","nextSteps":"s","relatedTests":"s","lifestyle":"s"}`,
+    sections:[["overview","What This Measures","📋"],["normalRange","Normal Range","📊"],["whatItMeans","What Your Result Means","🔍"],["highLow","High / Low","📈"],["nextSteps","Next Steps","✅"],["relatedTests","Related Tests","🔗"],["lifestyle","Lifestyle Factors","🌿"]]},
+  symptom:{title:"Symptom Checker",icon:"🩺",placeholder:"e.g. Fever and sore throat for 3 days…",
+    system:`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"name":"s","tagline":"s","overview":"s","possibleCauses":"s","urgencyLevel":"s","selfCare":"s","whenToSeekHelp":"s","tests":"s"}`,
+    sections:[["overview","Symptom Summary","📋"],["possibleCauses","Possible Causes","🔍"],["urgencyLevel","Urgency Level","🚦"],["selfCare","Self-Care Tips","🌿"],["whenToSeekHelp","When to Seek Help","🏥"],["tests","Tests Doctor May Order","🔬"]]},
+};
+
+function initSearchPage(type){
+  const wrap=document.getElementById("sw-"+type);
+  if(wrap.dataset.init) return;
+  wrap.dataset.init="1";
+  const cfg=CONFIGS[type];
+  wrap.innerHTML=`
+    <div class="page-header"><h2>${cfg.icon} ${cfg.title}</h2><p>Powered by MedDecoded AI · For educational purposes only</p></div>
+    <div class="search-row">
+      <input class="search-input" id="si-${type}" placeholder="${cfg.placeholder}" onkeydown="if(event.key==='Enter')doSearch('${type}')"/>
+      <button class="mic-btn" id="mic-${type}" onclick="toggleMic('${type}')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C7B8F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/>
+        </svg>
+      </button>
+      <button class="btn-teal" id="sbtn-${type}" onclick="doSearch('${type}')" style="padding:13px 26px;font-size:15px;white-space:nowrap">Search</button>
+    </div>
+    <div id="sr-${type}"></div>`;
+}
+
+async function doSearch(type){
+  const inp=document.getElementById("si-"+type);
+  const q=inp.value.trim(); if(!q) return;
+  const btn=document.getElementById("sbtn-"+type);
+  const res=document.getElementById("sr-"+type);
+  btn.textContent="Searching…"; btn.disabled=true;
+  res.innerHTML=`<div class="spinner-wrap"><div class="spinner"></div></div>${type==="disease"?'<p class="loading-note">Building full clinical report…</p>':""}`;
+  try{
+    const raw=await askAI(CONFIGS[type].system,q);
+    const parsed=JSON.parse(raw.replace(/```json|```/g,"").trim());
+    renderSearchResult(type,parsed,q,res);
+    await apiPost("/api/history",{search_type:type,query:q,result_json:parsed});
+  }catch(e){
+    res.innerHTML=`<div class="disclaimer"><p>Search failed: ${e.message}. Please try again.</p></div>`;
+  }
+  btn.textContent="Search"; btn.disabled=false;
+}
+
+function renderSearchResult(type,data,query,container){
+  const cfg=CONFIGS[type];
+  let html=`<div class="result-header"><div class="result-name">${data.name||query}</div><div class="result-tagline">${data.tagline||""}</div></div>`;
+  cfg.sections.forEach(([key,title,icon])=>{
+    if(!data[key]) return;
+    html+=`<div class="result-section"><div class="section-label"><span class="icon">${icon}</span><span class="title">${title}</span></div><div class="section-content">${data[key]}</div></div>`;
+  });
+  html+=`<div class="disclaimer"><p>⚕️ <strong>Medical Disclaimer:</strong> Educational purposes only. Always consult a qualified healthcare professional.</p></div>`;
+  container.innerHTML=html;
+}
+
+// ── Drug Checker ─────────────────────────────────────────────────────────────
+function initDrugChecker(){
+  const inp=document.getElementById("drug-inputs");
+  if(inp.children.length) return;
+  drugRows=2; inp.innerHTML="";
+  for(let i=0;i<2;i++) addDrugRow();
+}
+
+function addDrugRow(){
+  if(drugRows>=6) return;
+  const wrap=document.getElementById("drug-inputs");
+  const i=++drugRows;
+  const row=document.createElement("div");
+  row.className="drug-row"; row.id="drow-"+i;
+  row.innerHTML=`<span class="drug-num">#${i}</span>
+    <input class="drug-input" id="di-${i}" placeholder="Medicine ${i}…" onkeydown="if(event.key==='Enter')checkDrugs()"/>
+    <button class="mic-btn" onclick="toggleMicDrug(${i})">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5C7B8F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="22"/><line x1="9" y1="22" x2="15" y2="22"/>
+      </svg>
+    </button>
+    ${i>2?`<button class="btn-remove" onclick="document.getElementById('drow-${i}').remove();drugRows--">×</button>`:""}`;
+  wrap.appendChild(row);
+  if(drugRows>=6) document.getElementById("btn-add-drug").style.display="none";
+}
+
+async function checkDrugs(){
+  const drugs=[];
+  document.querySelectorAll(".drug-input").forEach(el=>{if(el.value.trim()) drugs.push(el.value.trim());});
+  if(drugs.length<2) return;
+  const btn=document.getElementById("btn-check-drugs");
+  const res=document.getElementById("drug-result");
+  btn.textContent="Checking…"; btn.disabled=true;
+  res.innerHTML=`<div class="spinner-wrap"><div class="spinner"></div></div>`;
+  try{
+    const raw=await askAI(`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"riskLevel":"low|moderate|high|critical","summary":"s","interactions":[{"pair":"s","severity":"mild|moderate|serious","description":"s"}],"recommendation":"s"}`,`Check interactions for: ${drugs.join(", ")}`);
+    const data=JSON.parse(raw.replace(/```json|```/g,"").trim());
+    await apiPost("/api/history",{search_type:"drug-checker",query:drugs.join(" + "),result_json:data});
+    renderDrugResult(data,res);
+  }catch(e){res.innerHTML=`<div class="disclaimer"><p>Check failed: ${e.message}. Please try again.</p></div>`;}
+  btn.textContent="Check Interactions"; btn.disabled=false;
+}
+
+function renderDrugResult(data,container){
+  const rc={low:{bg:"rgba(0,200,120,0.1)",border:"1px solid rgba(0,200,120,0.3)",color:"#00C878"},moderate:{bg:"rgba(255,185,0,0.1)",border:"1px solid rgba(255,185,0,0.3)",color:"#FFB900"},high:{bg:"rgba(255,110,50,0.1)",border:"1px solid rgba(255,110,50,0.3)",color:"#FF6E32"},critical:{bg:"rgba(255,50,50,0.1)",border:"1px solid rgba(255,50,50,0.3)",color:"#FF3232"}};
+  const sc={mild:"#00C878",moderate:"#FFB900",serious:"#FF6E32"};
+  const r=rc[data.riskLevel]||rc.moderate;
+  let html=`<div class="risk-card" style="background:${r.bg};border:${r.border}">
+    <div style="background:${r.bg};border:${r.border};border-radius:8px;padding:5px 14px;font-size:12px;font-weight:800;color:${r.color};text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;flex-shrink:0">${data.riskLevel} risk</div>
+    <p style="margin:0;color:var(--text);font-size:14.5px;line-height:1.75">${data.summary}</p></div>`;
+  (data.interactions||[]).forEach(inter=>{
+    const c=sc[inter.severity]||"#888";
+    html+=`<div class="interact-card"><div class="interact-head"><span class="interact-pair">${inter.pair}</span>
+      <span class="sev-tag" style="background:${c}22;color:${c}">${inter.severity}</span></div>
+      <p style="margin:0;color:var(--text);font-size:14px;line-height:1.75">${inter.description}</p></div>`;
+  });
+  if(data.recommendation) html+=`<div class="recommend-box"><p style="margin:0;color:var(--text);font-size:14px;line-height:1.75">💡 <strong style="color:var(--teal)">Recommendation: </strong>${data.recommendation}</p></div>`;
+  html+=`<div class="disclaimer" style="margin-top:1rem"><p>⚕️ <strong>Medical Disclaimer:</strong> Educational purposes only.</p></div>`;
+  container.innerHTML=html;
+}
+
+// ── Tracker ──────────────────────────────────────────────────────────────────
+const emptyForm={name:"",dosage:"",unit:"mg",frequency:"1",times:["08:00"],notes:"",color:MED_COLORS[0]};
+let addForm={...emptyForm}, editingId=null;
+const freqDefaults={"1":["08:00"],"2":["08:00","20:00"],"3":["08:00","14:00","20:00"],"4":["06:00","12:00","18:00","22:00"]};
+
+function toggleAddForm(){
+  const el=document.getElementById("add-med-form");
+  const show=el.style.display==="none";
+  if(show){addForm={...emptyForm};editingId=null;renderAddForm();}
+  el.style.display=show?"block":"none";
+  document.getElementById("btn-toggle-add").textContent=show?"Cancel":"+ Add Medicine";
+}
+
+function renderAddForm(){
+  document.getElementById("add-med-form").innerHTML=`
+    <div style="font-size:14px;font-weight:700;color:var(--teal);margin-bottom:1.25rem">${editingId?"Edit Medicine":"Add New Medicine"}</div>
+    <div class="form-grid-2">
+      <div><label class="field-label">Medicine Name</label><input class="field-input" value="${addForm.name}" placeholder="e.g. Metformin" oninput="addForm.name=this.value"/></div>
+      <div class="form-grid-small">
+        <div><label class="field-label">Dosage</label><input class="field-input" value="${addForm.dosage}" placeholder="500" oninput="addForm.dosage=this.value"/></div>
+        <div><label class="field-label">Unit</label><select class="field-select" onchange="addForm.unit=this.value">${["mg","mcg","ml","g","IU","tablet","capsule"].map(u=>`<option${addForm.unit===u?" selected":""}>${u}</option>`).join("")}</select></div>
+      </div>
+    </div>
+    <label class="field-label">Frequency</label>
+    <select class="field-select" onchange="addForm.frequency=this.value;addForm.times=freqDefaults[this.value]||['08:00'];renderAddForm()">
+      ${[["1","Once daily"],["2","Twice daily"],["3","Three times daily"],["4","Four times daily"]].map(([v,l])=>`<option value="${v}"${addForm.frequency===v?" selected":""}>${l}</option>`).join("")}
+    </select>
+    <label class="field-label">Schedule Times</label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.1rem">
+      ${addForm.times.map((t,i)=>`<input type="time" value="${t}" style="background:var(--surface);border:var(--border);border-radius:9px;padding:8px 12px;font-size:14px;color:var(--text);outline:none;width:120px" oninput="addForm.times[${i}]=this.value"/>`).join("")}
+    </div>
+    <label class="field-label">Color</label>
+    <div style="display:flex;gap:8px;margin-bottom:1.1rem">
+      ${MED_COLORS.map(c=>`<button class="color-swatch" style="background:${c};border:${addForm.color===c?"3px solid white":"3px solid transparent"}" onclick="addForm.color='${c}';renderAddForm()"></button>`).join("")}
+    </div>
+    <label class="field-label">Notes (optional)</label>
+    <input class="field-input" value="${addForm.notes}" placeholder="e.g. Take with food" oninput="addForm.notes=this.value"/>
+    <button class="btn-teal" style="padding:12px 28px" onclick="submitMed()">${editingId?"Save Changes":"Add Medicine"}</button>`;
+}
+
+async function submitMed(){
+  if(!addForm.name.trim()) return;
+  if(editingId){
+    await apiPut("/api/medicines/"+editingId,{...addForm});
+    medicines=medicines.map(m=>m.id===editingId?{...m,...addForm,id:editingId}:m);
+  }else{
+    const med=await apiPost("/api/medicines",{...addForm});
+    if(med.id) medicines.push(med);
+  }
+  editingId=null;addForm={...emptyForm};
+  document.getElementById("add-med-form").style.display="none";
+  document.getElementById("btn-toggle-add").textContent="+ Add Medicine";
+  renderTracker();
+}
+
+async function deleteMed(id){
+  await apiDelete("/api/medicines/"+id);
+  medicines=medicines.filter(m=>m.id!==id);
+  renderTracker();
+}
+
+function startEdit(id){
+  const m=medicines.find(x=>x.id===id);if(!m) return;
+  editingId=id;addForm={...m,times:Array.isArray(m.times)?m.times:JSON.parse(m.times||'["08:00"]')};
+  document.getElementById("add-med-form").style.display="block";
+  document.getElementById("btn-toggle-add").textContent="Cancel";
+  renderAddForm();
+}
+
+function todayKey(){return new Date().toISOString().slice(0,10);}
+function timeLabel(t){const [h,m]=t.split(":").map(Number);return `${h%12||12}:${String(m).padStart(2,"0")} ${h>=12?"PM":"AM"}`;}
+function isTaken(medId,time){return !!(adherence[todayKey()]?.[medId]?.[time]);}
+
+async function toggleTaken(medId,time){
+  const today=todayKey();
+  if(!adherence[today]) adherence[today]={};
+  if(!adherence[today][medId]) adherence[today][medId]={};
+  adherence[today][medId][time]=!adherence[today][medId][time];
+  await apiPost("/api/adherence",{medicine_id:medId,date:today,time_slot:time,taken:adherence[today][medId][time]});
+  renderTracker();
+}
+
+function adherenceScore(medId){
+  let total=0,taken=0;
+  const last7=Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-i);return d.toISOString().slice(0,10);});
+  const med=medicines.find(m=>m.id===medId);if(!med) return 0;
+  const times=Array.isArray(med.times)?med.times:JSON.parse(med.times||'[]');
+  last7.forEach(day=>{times.forEach(t=>{total++;if(adherence[day]?.[medId]?.[t]) taken++;});});
+  return total>0?Math.round((taken/total)*100):0;
+}
+
+function renderTracker(){
+  const schedEl=document.getElementById("today-schedule");
+  const listEl=document.getElementById("med-list");
+  if(!schedEl||!listEl) return;
+  if(medicines.length===0){
+    schedEl.innerHTML="";
+    listEl.innerHTML=`<div class="empty-state"><div class="empty-icon">💊</div><div class="empty-title">No medicines added yet</div><div style="font-size:14px">Tap "+ Add Medicine" to start tracking</div></div>`;
+    return;
+  }
+  const allSlots=medicines.flatMap(m=>{
+    const times=Array.isArray(m.times)?m.times:JSON.parse(m.times||'["08:00"]');
+    return times.map(t=>({...m,time:t,taken:isTaken(m.id,t)}));
+  }).sort((a,b)=>a.time.localeCompare(b.time));
+  schedEl.innerHTML=`<div class="section-title">Today's Schedule</div>
+    <div class="schedule-grid">${allSlots.map(item=>`
+      <div class="sched-card" style="border:1px solid ${item.taken?item.color+"44":"rgba(0,210,160,0.1)"};opacity:${item.taken?"0.65":"1"}">
+        <div class="sched-top"><div class="sched-dot" style="background:${item.color}"></div><span class="sched-time">${timeLabel(item.time)}</span></div>
+        <div class="sched-name">${item.name}</div>
+        <div class="sched-sub">${item.dosage||""}${item.unit||""}${item.notes?" · "+item.notes:""}</div>
+        <button class="taken-btn" onclick="toggleTaken(${item.id},'${item.time}')"
+          style="background:${item.taken?item.color+"22":item.color};border:1px solid ${item.color};color:${item.taken?item.color:"#07101D"}">
+          ${item.taken?"✓ Taken":"Mark as Taken"}
+        </button>
+      </div>`).join("")}
+    </div>`;
+  listEl.innerHTML=medicines.map(med=>{
+    const score=adherenceScore(med.id);
+    const times=Array.isArray(med.times)?med.times:JSON.parse(med.times||'[]');
+    const sc=score>=80?"var(--teal)":score>=50?"#FFB900":"#FF6E32";
+    return `<div class="med-list-card">
+      <div class="med-dot" style="background:${med.color}"></div>
+      <div class="med-info">
+        <div class="med-name">${med.name} <span style="color:var(--muted);font-weight:400;font-size:14px">${med.dosage||""}${med.unit||""}</span></div>
+        <div class="med-sub">${["","Once","Twice","3×","4×"][med.frequency]||"?"} daily · ${times.map(timeLabel).join(", ")}${med.notes?" · "+med.notes:""}</div>
+      </div>
+      <div class="adherence-score"><div class="adherence-val" style="color:${sc}">${score}%</div><div class="adherence-lbl">7-day</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-edit" onclick="startEdit(${med.id})">Edit</button>
+        <button class="btn-delete" onclick="deleteMed(${med.id})">Remove</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── Profile ──────────────────────────────────────────────────────────────────
+async function loadProfile(){
+  const data=await apiGet("/api/profile");
+  if(!data||data.error) return;
+  document.getElementById("p-name").value=data.name||"";
+  document.getElementById("p-age").value=data.age||"";
+  document.getElementById("p-gender").value=data.gender||"";
+  document.getElementById("p-blood").value=data.blood_type||"";
+  document.getElementById("p-conditions").value=data.conditions||"";
+  document.getElementById("p-allergies").value=data.allergies||"";
+  document.getElementById("p-doctor").value=data.doctor||"";
+  document.getElementById("p-phone").value=data.phone||"";
+  document.getElementById("p-notes").value=data.notes||"";
+  updateProfileSummary();
+}
+
+async function saveProfile(){
+  await apiPost("/api/profile",{
+    age:document.getElementById("p-age").value,
+    gender:document.getElementById("p-gender").value,
+    blood_type:document.getElementById("p-blood").value,
+    conditions:document.getElementById("p-conditions").value,
+    allergies:document.getElementById("p-allergies").value,
+    doctor:document.getElementById("p-doctor").value,
+    phone:document.getElementById("p-phone").value,
+    notes:document.getElementById("p-notes").value,
+  });
+  const s=document.getElementById("profile-saved");
+  s.style.display="inline";setTimeout(()=>s.style.display="none",2500);
+  updateProfileSummary();
+}
+
+function updateProfileSummary(){
+  const cond=document.getElementById("p-conditions").value;
+  const allg=document.getElementById("p-allergies").value;
+  const sum=document.getElementById("profile-summary");
+  const cnt=document.getElementById("summary-content");
+  if(cond||allg){
+    sum.style.display="block";
+    cnt.innerHTML=(cond?`<p style="margin:0 0 0.5rem;color:var(--text);font-size:14px">🩺 <strong>Conditions:</strong> ${cond}</p>`:"")+
+      (allg?`<p style="margin:0;color:var(--text);font-size:14px">⚠️ <strong>Allergies:</strong> ${allg}</p>`:"");
+  }else{sum.style.display="none";}
+}
+
+// ── History ──────────────────────────────────────────────────────────────────
+const typeEmoji={medicine:"💊",disease:"🦠",surgery:"🏥",lab:"🔬",symptom:"🩺","drug-checker":"⚠️"};
+
+async function loadHistory(){
+  const list=document.getElementById("history-list");
+  list.innerHTML=`<div class="spinner-wrap"><div class="spinner"></div></div>`;
+  const data=await apiGet("/api/history");
+  if(!Array.isArray(data)||data.length===0){
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon">🕓</div><div class="empty-title">No search history yet</div><div style="font-size:14px">Your searches will appear here</div></div>`;
+    return;
+  }
+  list.innerHTML=data.map(item=>`
+    <div class="history-item" onclick="viewHistory(${item.id},'${item.search_type}')">
+      <div>
+        <div class="history-type">${typeEmoji[item.search_type]||"🔍"} ${item.search_type.replace("-"," ")}</div>
+        <div class="history-query">${item.query}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span class="history-date">${new Date(item.searched_at).toLocaleDateString("en-IN",{day:"numeric",month:"short"})}</span>
+        <button class="btn-del-history" onclick="event.stopPropagation();deleteHistory(${item.id})">×</button>
+      </div>
+    </div>`).join("");
+}
+
+async function viewHistory(id,type){
+  const data=await apiGet("/api/history/"+id);
+  if(!data||data.error) return;
+  navigate(type==="drug-checker"?"drug-checker":type);
+  if(type!=="drug-checker"){
+    const res=document.getElementById("sr-"+type);
+    if(res) renderSearchResult(type,data.result_json,data.query,res);
+  }
+}
+
+async function deleteHistory(id){
+  await apiDelete("/api/history/"+id);
+  loadHistory();
+}
+
+// ── Voice ────────────────────────────────────────────────────────────────────
+let activeRec=null;
+function toggleMic(type){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR) return;
+  if(activeRec){try{activeRec.stop();}catch{}activeRec=null;return;}
+  const rec=new SR();rec.lang="en-US";rec.continuous=false;rec.interimResults=false;
+  const btn=document.getElementById("mic-"+type);
+  btn?.classList.add("listening");activeRec=rec;
+  rec.onresult=e=>{document.getElementById("si-"+type).value=e.results[0][0].transcript;btn?.classList.remove("listening");activeRec=null;doSearch(type);};
+  rec.onend=()=>{btn?.classList.remove("listening");activeRec=null;};
+  rec.start();
+}
+function toggleMicDrug(i){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR) return;
+  const rec=new SR();rec.lang="en-US";
+  rec.onresult=e=>{const el=document.getElementById("di-"+i);if(el) el.value=e.results[0][0].transcript;};
+  rec.start();
+}
+</script>
+</body>
+</html>
