@@ -15,8 +15,6 @@
   --nav-bg:rgba(7,16,29,0.55);
 }
 body{background:var(--bg);color:var(--text);font-family:'DM Sans','Segoe UI',system-ui,sans-serif;min-height:100vh;transition:background 0.3s,color 0.3s}
-
-/* Light mode */
 body.light{
   --bg:#F0F7FF;--surface:rgba(0,0,0,0.04);--surface-hover:rgba(0,210,160,0.08);
   --border:1px solid rgba(0,180,140,0.2);--border-hover:1px solid rgba(0,210,160,0.5);
@@ -46,11 +44,6 @@ body.light select option{background:#fff;color:#0A2540}
 body.light .hero h1{color:#0A2540}
 body.light .disclaimer p{color:#cc4444}
 body.light .disclaimer{background:rgba(255,80,80,0.06);border:1px solid rgba(255,80,80,0.2)}
-
-/* Floating theme toggle */
-.theme-toggle{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:999;background:var(--surface);border:var(--border);border-radius:30px;padding:8px 6px;display:flex;flex-direction:column;gap:6px;backdrop-filter:blur(12px);box-shadow:0 4px 20px rgba(0,0,0,0.2)}
-.theme-btn{background:transparent;border:none;cursor:pointer;font-size:18px;padding:6px;border-radius:20px;transition:background 0.2s;line-height:1}
-.theme-btn:hover{background:var(--teal-glow)}
 input,select,textarea,button{font-family:inherit}
 input::placeholder,textarea::placeholder{color:var(--muted)}
 select option{background:#0D1B2A}
@@ -65,6 +58,9 @@ nav{position:sticky;top:0;z-index:100;height:58px;background:var(--nav-bg);backd
 .nav-btn:hover{color:var(--text)}
 .nav-btn.active{background:var(--teal-glow);border:var(--teal-border);color:var(--teal);font-weight:600}
 .nav-ver{font-size:11px;color:#FF9999;background:var(--surface);border:1px solid rgba(255,107,107,0.3);border-radius:20px;padding:3px 11px;flex-shrink:0;cursor:pointer}
+.theme-toggle{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:999;background:var(--surface);border:var(--border);border-radius:30px;padding:8px 6px;display:flex;flex-direction:column;gap:6px;backdrop-filter:blur(12px);box-shadow:0 4px 20px rgba(0,0,0,0.2)}
+.theme-btn{background:transparent;border:none;cursor:pointer;font-size:18px;padding:6px;border-radius:20px;transition:background 0.2s;line-height:1}
+.theme-btn:hover{background:var(--teal-glow)}
 .page{display:none}.page.active{display:block}
 .hero{text-align:center;padding:4.5rem 2rem 3rem}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--teal-glow);border:var(--teal-border);border-radius:20px;padding:5px 16px;margin-bottom:1.75rem;font-size:11.5px;color:var(--teal);letter-spacing:0.1em;text-transform:uppercase;font-weight:600}
@@ -183,6 +179,7 @@ nav{position:sticky;top:0;z-index:100;height:58px;background:var(--nav-bg);backd
 </head>
 <body>
 
+<!-- Floating Theme Toggle -->
 <div class="theme-toggle">
   <button class="theme-btn" onclick="setTheme('dark')" title="Dark mode">🌙</button>
   <button class="theme-btn" onclick="setTheme('light')" title="Light mode">☀️</button>
@@ -254,7 +251,7 @@ nav{position:sticky;top:0;z-index:100;height:58px;background:var(--nav-bg);backd
       <div class="feature-card" onclick="navigate('disease')"><div class="feature-icon">🦠</div><div class="feature-title">Disease Decoder</div><div class="feature-desc">Symptoms, causes, treatments &amp; prevention.</div></div>
       <div class="feature-card" onclick="navigate('drug-checker')"><div class="feature-icon">⚠️</div><div class="feature-title">Drug Checker</div><div class="feature-desc">Check dangerous medicine combinations.</div></div>
       <div class="feature-card" onclick="navigate('surgery')"><div class="feature-icon">🏥</div><div class="feature-title">Surgery Explainer</div><div class="feature-desc">What to expect before, during &amp; after.</div></div>
-      <div class="feature-card" onclick="navigate('lab')"><div class="feature-icon">🔬</div><div class="feature-title">Lab Report Reader</div><div class="feature-desc">Understand your test results in plain English.</div></div>
+      <div class="feature-card" onclick="navigate('lab')"><div class="feature-icon">🔬</div><div class="feature-title">Lab Report Reader</div><div class="feature-desc">Upload your report — AI analyzes everything.</div></div>
       <div class="feature-card" onclick="navigate('symptom')"><div class="feature-icon">🩺</div><div class="feature-title">Symptom Checker</div><div class="feature-desc">Describe symptoms, get possible causes.</div></div>
     </div>
   </div>
@@ -262,32 +259,32 @@ nav{position:sticky;top:0;z-index:100;height:58px;background:var(--nav-bg);backd
   <div id="page-medicine" class="page"><div class="search-wrap" id="sw-medicine"></div></div>
   <div id="page-disease" class="page"><div class="search-wrap" id="sw-disease"></div></div>
   <div id="page-surgery" class="page"><div class="search-wrap" id="sw-surgery"></div></div>
-  <div id="page-lab" class="page">
-  <div class="search-wrap">
-    <div class="page-header"><h2>🔬 Lab Report Reader</h2><p>Upload a photo of your lab report — AI will analyze everything</p></div>
-    <div style="background:var(--surface);border:var(--border);border-radius:16px;padding:2rem;margin-bottom:1.5rem;text-align:center">
-      <div id="lab-preview" style="display:none;margin-bottom:1.5rem">
-        <img id="lab-img" style="max-width:100%;max-height:300px;border-radius:12px;border:var(--teal-border)"/>
-      </div>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem">
-        <label style="background:var(--teal);color:#07101D;border:none;border-radius:11px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
-          📁 Upload Photo
-          <input type="file" id="lab-file" accept="image/*" style="display:none" onchange="previewLabImage(this)"/>
-        </label>
-        <label style="background:var(--surface);color:var(--text);border:var(--teal-border);border-radius:11px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
-          📷 Take Photo
-          <input type="file" id="lab-camera" accept="image/*" capture="environment" style="display:none" onchange="previewLabImage(this)"/>
-        </label>
-      </div>
-      <p style="color:var(--muted);font-size:13px">Supports JPG, PNG — blood tests, urine reports, thyroid, sugar, CBC and more</p>
-    </div>
-    <div style="display:flex;gap:10px;margin-bottom:2rem">
-      <button class="btn-teal" id="sbtn-lab" onclick="analyzeLabReport()" style="padding:13px 26px;font-size:15px;width:100%" disabled>🔬 Analyze Report</button>
-    </div>
-    <div id="sr-lab"></div>
-  </div>
-</div>
   <div id="page-symptom" class="page"><div class="search-wrap" id="sw-symptom"></div></div>
+
+  <!-- Lab Report Page -->
+  <div id="page-lab" class="page">
+    <div class="search-wrap">
+      <div class="page-header"><h2>🔬 Lab Report Reader</h2><p>Upload a photo of your lab report — AI will analyze everything</p></div>
+      <div style="background:var(--surface);border:var(--border);border-radius:16px;padding:2rem;margin-bottom:1.5rem;text-align:center">
+        <div id="lab-preview" style="display:none;margin-bottom:1.5rem">
+          <img id="lab-img" style="max-width:100%;max-height:300px;border-radius:12px;border:var(--teal-border)"/>
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem">
+          <label style="background:var(--teal);color:#07101D;border:none;border-radius:11px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+            📁 Upload Photo
+            <input type="file" id="lab-file" accept="image/*" style="display:none" onchange="previewLabImage(this)"/>
+          </label>
+          <label style="background:var(--surface);color:var(--text);border:var(--teal-border);border-radius:11px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+            📷 Take Photo
+            <input type="file" id="lab-camera" accept="image/*" capture="environment" style="display:none" onchange="previewLabImage(this)"/>
+          </label>
+        </div>
+        <p style="color:var(--muted);font-size:13px">Supports JPG, PNG — blood tests, urine reports, thyroid, sugar, CBC and more</p>
+      </div>
+      <button class="btn-teal" id="sbtn-lab" onclick="analyzeLabReport()" style="padding:13px 26px;font-size:15px;width:100%;margin-bottom:2rem" disabled>🔬 Analyze Report</button>
+      <div id="sr-lab"></div>
+    </div>
+  </div>
 
   <div id="page-drug-checker" class="page">
     <div class="search-wrap">
@@ -360,10 +357,15 @@ const API = "https://meddecoded-backend.onrender.com";
 const OR_KEY = "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";
 const OR_URL = "https://openrouter.ai/api/v1/chat/completions";
 const OR_MODEL = "anthropic/claude-3-haiku";
-
 const MED_COLORS = ["#00D2A0","#4A9FFF","#FF6B9D","#FFB547","#A78BFA","#34D399","#F87171","#60A5FA"];
 let token = localStorage.getItem("md_token");
 let currentUser = null, medicines = [], adherence = {}, drugRows = 2;
+
+// ── Theme (defined first!) ───────────────────────────────────────────────────
+function setTheme(t){
+  document.body.classList.toggle('light', t==='light');
+  localStorage.setItem('md_theme', t);
+}
 
 // ── API helpers ──────────────────────────────────────────────────────────────
 async function apiFetch(path, opts={}) {
@@ -381,24 +383,12 @@ const apiDelete = p => apiFetch(p,{method:"DELETE"});
 // ── OpenRouter AI ────────────────────────────────────────────────────────────
 async function askAI(system, user) {
   const res = await fetch(OR_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + OR_KEY,
-      "HTTP-Referer": "https://meddecoded-backend.onrender.com",
-      "X-Title": "MedDecoded"
-    },
-    body: JSON.stringify({
-      model: OR_MODEL,
-      max_tokens: 4000,
-      messages: [
-        {role:"system", content: system},
-        {role:"user", content: user}
-      ]
-    })
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+OR_KEY,"HTTP-Referer":"http://localhost","X-Title":"MedDecoded"},
+    body: JSON.stringify({model:OR_MODEL, max_tokens:4000, messages:[{role:"system",content:system},{role:"user",content:user}]})
   });
   const d = await res.json();
-  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  if(d.error) throw new Error(d.error.message||JSON.stringify(d.error));
   return d.choices[0].message.content;
 }
 
@@ -465,7 +455,6 @@ async function init(){
   }
   document.getElementById("auth-gate").style.display="block";
 }
-init();
 
 // ── Navigation ───────────────────────────────────────────────────────────────
 function navigate(page){
@@ -490,9 +479,6 @@ const CONFIGS={
   surgery:{title:"Surgery Explainer",icon:"🏥",placeholder:"e.g. Appendectomy, Bypass…",
     system:`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"name":"s","tagline":"s","overview":"s","preparation":"s","procedure":"s","recovery":"s","risks":"s","alternatives":"s","whenNeeded":"s"}`,
     sections:[["overview","Overview","📋"],["preparation","Before Surgery","📝"],["procedure","The Procedure","🔧"],["recovery","Recovery","💪"],["risks","Risks","⚠️"],["alternatives","Alternatives","🔄"],["whenNeeded","When Needed","🚨"]]},
-  lab:{title:"Lab Report Reader",icon:"🔬",placeholder:"e.g. HbA1c 7.2, TSH 5.1…",
-    system:`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"name":"s","tagline":"s","overview":"s","normalRange":"s","whatItMeans":"s","highLow":"s","nextSteps":"s","relatedTests":"s","lifestyle":"s"}`,
-    sections:[["overview","What This Measures","📋"],["normalRange","Normal Range","📊"],["whatItMeans","What Your Result Means","🔍"],["highLow","High / Low","📈"],["nextSteps","Next Steps","✅"],["relatedTests","Related Tests","🔗"],["lifestyle","Lifestyle Factors","🌿"]]},
   symptom:{title:"Symptom Checker",icon:"🩺",placeholder:"e.g. Fever and sore throat for 3 days…",
     system:`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"name":"s","tagline":"s","overview":"s","possibleCauses":"s","urgencyLevel":"s","selfCare":"s","whenToSeekHelp":"s","tests":"s"}`,
     sections:[["overview","Symptom Summary","📋"],["possibleCauses","Possible Causes","🔍"],["urgencyLevel","Urgency Level","🚦"],["selfCare","Self-Care Tips","🌿"],["whenToSeekHelp","When to Seek Help","🏥"],["tests","Tests Doctor May Order","🔬"]]},
@@ -547,6 +533,79 @@ function renderSearchResult(type,data,query,container){
   container.innerHTML=html;
 }
 
+// ── Lab Report ───────────────────────────────────────────────────────────────
+let labImageBase64 = null;
+
+function previewLabImage(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    labImageBase64=e.target.result.split(',')[1];
+    document.getElementById('lab-img').src=e.target.result;
+    document.getElementById('lab-preview').style.display='block';
+    document.getElementById('sbtn-lab').disabled=false;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzeLabReport(){
+  if(!labImageBase64) return;
+  const btn=document.getElementById('sbtn-lab');
+  const res=document.getElementById('sr-lab');
+  btn.textContent='Analyzing…'; btn.disabled=true;
+  res.innerHTML=`<div class="spinner-wrap"><div class="spinner"></div></div><p class="loading-note">Reading your lab report…</p>`;
+  try{
+    const response=await fetch(OR_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+OR_KEY,'HTTP-Referer':'http://localhost','X-Title':'MedDecoded'},
+      body:JSON.stringify({
+        model:'anthropic/claude-3-haiku',
+        max_tokens:4000,
+        messages:[{role:'user',content:[
+          {type:'image_url',image_url:{url:`data:image/jpeg;base64,${labImageBase64}`}},
+          {type:'text',text:`You are MedDecoded AI. Analyze this lab report image and respond ONLY with valid JSON, no markdown:
+{"reportTitle":"s","patientSummary":"s","testResults":[{"testName":"s","value":"s","normalRange":"s","status":"Normal|High|Low|Critical","interpretation":"s"}],"overallAssessment":"s","concerningFindings":"s","recommendations":"s","lifestyle":"s"}
+Extract every single test value visible in the report.`}
+        ]}]
+      })
+    });
+    const data=await response.json();
+    if(data.error) throw new Error(data.error.message);
+    const parsed=JSON.parse(data.choices[0].message.content.replace(/```json|```/g,'').trim());
+    renderLabResult(parsed,res);
+    await apiPost('/api/history',{search_type:'lab',query:'Lab Report Image',result_json:parsed});
+  }catch(e){
+    res.innerHTML=`<div class="disclaimer"><p>Analysis failed: ${e.message}. Please try a clearer image.</p></div>`;
+  }
+  btn.textContent='🔬 Analyze Report'; btn.disabled=false;
+}
+
+function renderLabResult(data,container){
+  const sc={Normal:'#00C878',High:'#FFB900',Low:'#4A9FFF',Critical:'#FF3232'};
+  let html=`<div class="result-header"><div class="result-name">${data.reportTitle||'Lab Report Analysis'}</div><div class="result-tagline">${data.patientSummary||''}</div></div>`;
+  if(data.testResults?.length){
+    html+=`<div class="result-section"><div class="section-label"><span class="icon">📊</span><span class="title">Test Results</span></div>`;
+    data.testResults.forEach(t=>{
+      const c=sc[t.status]||'#888';
+      html+=`<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--dim);gap:12px;flex-wrap:wrap">
+        <div style="flex:1"><div style="font-weight:700;color:var(--text);font-size:14px">${t.testName}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${t.interpretation||''}</div></div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-weight:800;color:${c};font-size:15px">${t.value}</div>
+          <div style="font-size:11px;color:var(--muted)">${t.normalRange||''}</div>
+          <div style="font-size:11px;font-weight:700;color:${c};background:${c}22;border-radius:20px;padding:2px 8px;margin-top:3px">${t.status}</div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+  if(data.overallAssessment) html+=`<div class="result-section"><div class="section-label"><span class="icon">🩺</span><span class="title">Overall Assessment</span></div><div class="section-content">${data.overallAssessment}</div></div>`;
+  if(data.concerningFindings) html+=`<div class="result-section"><div class="section-label"><span class="icon">⚠️</span><span class="title">Concerning Findings</span></div><div class="section-content">${data.concerningFindings}</div></div>`;
+  if(data.recommendations) html+=`<div class="result-section"><div class="section-label"><span class="icon">✅</span><span class="title">Recommendations</span></div><div class="section-content">${data.recommendations}</div></div>`;
+  if(data.lifestyle) html+=`<div class="result-section"><div class="section-label"><span class="icon">🌿</span><span class="title">Lifestyle Tips</span></div><div class="section-content">${data.lifestyle}</div></div>`;
+  html+=`<div class="disclaimer"><p>⚕️ <strong>Medical Disclaimer:</strong> Educational purposes only. Always consult a qualified healthcare professional.</p></div>`;
+  container.innerHTML=html;
+}
+
 // ── Drug Checker ─────────────────────────────────────────────────────────────
 function initDrugChecker(){
   const inp=document.getElementById("drug-inputs");
@@ -583,11 +642,11 @@ async function checkDrugs(){
   btn.textContent="Checking…"; btn.disabled=true;
   res.innerHTML=`<div class="spinner-wrap"><div class="spinner"></div></div>`;
   try{
-    const raw=await askAI(`You are MedDecoded AI. Respond ONLY with valid JSON, no markdown:{"riskLevel":"low|moderate|high|critical","summary":"s","interactions":[{"pair":"s","severity":"mild|moderate|serious","description":"s"}],"recommendation":"s"}`,`Check interactions for: ${drugs.join(", ")}`);
+    const raw=await askAI(`You are MedDecoded AI. Respond ONLY with valid JSON:{"riskLevel":"low|moderate|high|critical","summary":"s","interactions":[{"pair":"s","severity":"mild|moderate|serious","description":"s"}],"recommendation":"s"}`,`Check interactions for: ${drugs.join(", ")}`);
     const data=JSON.parse(raw.replace(/```json|```/g,"").trim());
     await apiPost("/api/history",{search_type:"drug-checker",query:drugs.join(" + "),result_json:data});
     renderDrugResult(data,res);
-  }catch(e){res.innerHTML=`<div class="disclaimer"><p>Check failed: ${e.message}. Please try again.</p></div>`;}
+  }catch(e){res.innerHTML=`<div class="disclaimer"><p>Check failed: ${e.message}</p></div>`;}
   btn.textContent="Check Interactions"; btn.disabled=false;
 }
 
@@ -816,6 +875,7 @@ async function viewHistory(id,type){
   const data=await apiGet("/api/history/"+id);
   if(!data||data.error) return;
   navigate(type==="drug-checker"?"drug-checker":type);
+  if(type==="lab"&&data.result_json){renderLabResult(data.result_json,document.getElementById("sr-lab"));return;}
   if(type!=="drug-checker"){
     const res=document.getElementById("sr-"+type);
     if(res) renderSearchResult(type,data.result_json,data.query,res);
@@ -847,6 +907,10 @@ function toggleMicDrug(i){
   rec.onresult=e=>{const el=document.getElementById("di-"+i);if(el) el.value=e.results[0][0].transcript;};
   rec.start();
 }
+
+// ── Init (runs last) ─────────────────────────────────────────────────────────
+setTheme(localStorage.getItem('md_theme')||'dark');
+init();
 </script>
 </body>
 </html>
