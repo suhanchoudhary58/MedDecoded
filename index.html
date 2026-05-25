@@ -12,15 +12,52 @@
   --teal:#00D2A0;--teal-glow:rgba(0,210,160,0.12);--teal-border:1px solid #00D2A0;
   --text:#DFF0F7;--muted:#5C7B8F;--dim:rgba(255,255,255,0.07);
   --red-bg:rgba(255,107,107,0.08);--red-border:1px solid rgba(255,107,107,0.22);
+  --nav-bg:rgba(7,16,29,0.55);
 }
-body{background:var(--bg);color:var(--text);font-family:'DM Sans','Segoe UI',system-ui,sans-serif;min-height:100vh}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans','Segoe UI',system-ui,sans-serif;min-height:100vh;transition:background 0.3s,color 0.3s}
+
+/* Light mode */
+body.light{
+  --bg:#F0F7FF;--surface:rgba(0,0,0,0.04);--surface-hover:rgba(0,210,160,0.08);
+  --border:1px solid rgba(0,180,140,0.2);--border-hover:1px solid rgba(0,210,160,0.5);
+  --teal:#00A882;--teal-glow:rgba(0,210,160,0.1);--teal-border:1px solid #00A882;
+  --text:#0A2540;--muted:#4A6680;--dim:rgba(0,0,0,0.08);
+  --red-bg:rgba(255,80,80,0.07);--red-border:1px solid rgba(255,80,80,0.25);
+  --nav-bg:rgba(240,247,255,0.75);
+  background:#F0F7FF;color:#0A2540;
+}
+body.light nav{background:rgba(220,240,255,0.75)!important;border-bottom:1px solid rgba(0,180,140,0.15)!important}
+body.light .nav-btn{color:#4A6680}
+body.light .nav-btn.active{color:#00A882;background:rgba(0,210,160,0.1)}
+body.light .nav-brand{color:#00A882}
+body.light .nav-brand span{color:#0A2540}
+body.light input,body.light select,body.light textarea{background:rgba(255,255,255,0.9)!important;color:#0A2540!important;border:1px solid rgba(0,180,140,0.25)!important}
+body.light .auth-card{background:rgba(255,255,255,0.95);box-shadow:0 8px 32px rgba(0,0,0,0.08)}
+body.light .feature-card{background:rgba(255,255,255,0.7);border:1px solid rgba(0,180,140,0.15)}
+body.light .feature-card:hover{background:rgba(255,255,255,0.95)}
+body.light .result-section{background:rgba(255,255,255,0.7)}
+body.light .interact-card{background:rgba(255,255,255,0.7)}
+body.light .med-list-card{background:rgba(255,255,255,0.7)}
+body.light .sched-card{background:rgba(255,255,255,0.7)}
+body.light .add-form{background:rgba(255,255,255,0.8)}
+body.light .history-item{background:rgba(255,255,255,0.7)}
+body.light .theme-toggle{background:rgba(255,255,255,0.8);box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+body.light select option{background:#fff;color:#0A2540}
+body.light .hero h1{color:#0A2540}
+body.light .disclaimer p{color:#cc4444}
+body.light .disclaimer{background:rgba(255,80,80,0.06);border:1px solid rgba(255,80,80,0.2)}
+
+/* Floating theme toggle */
+.theme-toggle{position:fixed;right:18px;top:50%;transform:translateY(-50%);z-index:999;background:var(--surface);border:var(--border);border-radius:30px;padding:8px 6px;display:flex;flex-direction:column;gap:6px;backdrop-filter:blur(12px);box-shadow:0 4px 20px rgba(0,0,0,0.2)}
+.theme-btn{background:transparent;border:none;cursor:pointer;font-size:18px;padding:6px;border-radius:20px;transition:background 0.2s;line-height:1}
+.theme-btn:hover{background:var(--teal-glow)}
 input,select,textarea,button{font-family:inherit}
 input::placeholder,textarea::placeholder{color:var(--muted)}
 select option{background:#0D1B2A}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:rgba(0,210,160,0.2);border-radius:3px}
-nav{position:sticky;top:0;z-index:100;height:58px;background:rgba(7,16,29,0.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--dim);display:flex;align-items:center;gap:4px;padding:0 1.5rem;overflow-x:auto}
+nav{position:sticky;top:0;z-index:100;height:58px;background:var(--nav-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,210,160,0.1);display:flex;align-items:center;gap:4px;padding:0 1.5rem;overflow-x:auto}
 .nav-brand{background:transparent;border:none;cursor:pointer;font-size:17px;font-weight:800;color:var(--teal);letter-spacing:-0.02em;white-space:nowrap;padding:0 8px 0 0}
 .nav-brand span{color:var(--text)}
 .nav-links{display:flex;gap:2px;flex:1}
@@ -146,6 +183,11 @@ nav{position:sticky;top:0;z-index:100;height:58px;background:rgba(7,16,29,0.93);
 </head>
 <body>
 
+<div class="theme-toggle">
+  <button class="theme-btn" onclick="setTheme('dark')" title="Dark mode">🌙</button>
+  <button class="theme-btn" onclick="setTheme('light')" title="Light mode">☀️</button>
+</div>
+
 <div id="auth-gate">
   <div class="auth-wrap">
     <div class="auth-card">
@@ -220,7 +262,31 @@ nav{position:sticky;top:0;z-index:100;height:58px;background:rgba(7,16,29,0.93);
   <div id="page-medicine" class="page"><div class="search-wrap" id="sw-medicine"></div></div>
   <div id="page-disease" class="page"><div class="search-wrap" id="sw-disease"></div></div>
   <div id="page-surgery" class="page"><div class="search-wrap" id="sw-surgery"></div></div>
-  <div id="page-lab" class="page"><div class="search-wrap" id="sw-lab"></div></div>
+  <div id="page-lab" class="page">
+  <div class="search-wrap">
+    <div class="page-header"><h2>🔬 Lab Report Reader</h2><p>Upload a photo of your lab report — AI will analyze everything</p></div>
+    <div style="background:var(--surface);border:var(--border);border-radius:16px;padding:2rem;margin-bottom:1.5rem;text-align:center">
+      <div id="lab-preview" style="display:none;margin-bottom:1.5rem">
+        <img id="lab-img" style="max-width:100%;max-height:300px;border-radius:12px;border:var(--teal-border)"/>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem">
+        <label style="background:var(--teal);color:#07101D;border:none;border-radius:11px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+          📁 Upload Photo
+          <input type="file" id="lab-file" accept="image/*" style="display:none" onchange="previewLabImage(this)"/>
+        </label>
+        <label style="background:var(--surface);color:var(--text);border:var(--teal-border);border-radius:11px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+          📷 Take Photo
+          <input type="file" id="lab-camera" accept="image/*" capture="environment" style="display:none" onchange="previewLabImage(this)"/>
+        </label>
+      </div>
+      <p style="color:var(--muted);font-size:13px">Supports JPG, PNG — blood tests, urine reports, thyroid, sugar, CBC and more</p>
+    </div>
+    <div style="display:flex;gap:10px;margin-bottom:2rem">
+      <button class="btn-teal" id="sbtn-lab" onclick="analyzeLabReport()" style="padding:13px 26px;font-size:15px;width:100%" disabled>🔬 Analyze Report</button>
+    </div>
+    <div id="sr-lab"></div>
+  </div>
+</div>
   <div id="page-symptom" class="page"><div class="search-wrap" id="sw-symptom"></div></div>
 
   <div id="page-drug-checker" class="page">
@@ -290,7 +356,7 @@ nav{position:sticky;top:0;z-index:100;height:58px;background:rgba(7,16,29,0.93);
 
 <script>
 // ── Config ───────────────────────────────────────────────────────────────────
-const API = "https://meddecoded.onrender.com";
+const API = "https://meddecoded-backend.onrender.com";
 const OR_KEY = "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";
 const OR_URL = "https://openrouter.ai/api/v1/chat/completions";
 const OR_MODEL = "anthropic/claude-3-haiku";
@@ -319,7 +385,7 @@ async function askAI(system, user) {
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + OR_KEY,
-      "HTTP-Referer": "http://localhost",
+      "HTTP-Referer": "https://meddecoded-backend.onrender.com",
       "X-Title": "MedDecoded"
     },
     body: JSON.stringify({
@@ -407,7 +473,7 @@ function navigate(page){
   document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
   document.getElementById("page-"+page)?.classList.add("active");
   document.querySelector(`[data-page="${page}"]`)?.classList.add("active");
-  if(["medicine","disease","surgery","lab","symptom"].includes(page)) initSearchPage(page);
+  if(["medicine","disease","surgery","symptom"].includes(page)) initSearchPage(page);
   if(page==="drug-checker") initDrugChecker();
   if(page==="history") loadHistory();
   if(page==="tracker") renderTracker();
